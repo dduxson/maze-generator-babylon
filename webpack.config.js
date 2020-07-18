@@ -14,5 +14,5 @@ module.exports = {
             { test: /\.tsx?$/, loader: "ts-loader" }
         ]
     },
-    mode: "development"
+    mode: "development",
 };

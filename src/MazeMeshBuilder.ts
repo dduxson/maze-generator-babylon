@@ -35,7 +35,8 @@ export class MazeMeshBuilder {
 
         var vertexData = new BABYLON.VertexData();
         vertexData.positions = verts;
-        vertexData.indices = indices;    
+        vertexData.indices = indices;
+        vertexData.normals = normals;
 
         var floor_mesh = new BABYLON.Mesh("maze_floor", scene);
         vertexData.applyToMesh(floor_mesh);
@@ -145,7 +146,8 @@ export class MazeMeshBuilder {
 
         var vertexData = new BABYLON.VertexData();
         vertexData.positions = verts;
-        vertexData.indices = indices;    
+        vertexData.indices = indices;
+        vertexData.normals = normals;    
 
         var top_walls_mesh = new BABYLON.Mesh("maze_walls", scene);
         vertexData.applyToMesh(top_walls_mesh);
