@@ -52,6 +52,7 @@ export class MazeMeshBuilder {
 
     generateWalls(maze : Maze, scene: BABYLON.Scene) : BABYLON.Mesh {
         let verts = [];
+        let uvs = [];
         let indices = [];
         var normals = [];
 
