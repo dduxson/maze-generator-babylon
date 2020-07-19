@@ -84,7 +84,7 @@ export class MazeMeshBuilder {
                         start_loc_x -= halfWallThickness; 
                     }
 
-                    this.generateTopWallTriSubMesh(start_loc_x, start_loc_y, end_loc_x, end_loc_y, verts, indices);
+                    this.generateTopWallTriSubMesh(start_loc_x, start_loc_y, end_loc_x, end_loc_y, verts, uvs, indices);
 			    }
 
                 //Put up down walls around perimeter only. Reason is that the down wall will be in the exact same place as the up otherwise.
@@ -102,7 +102,7 @@ export class MazeMeshBuilder {
                         start_loc_x -= halfWallThickness;
                     }
 
-                    this.generateTopWallTriSubMesh(start_loc_x, start_loc_y, end_loc_x, end_loc_y, verts, indices);
+                    this.generateTopWallTriSubMesh(start_loc_x, start_loc_y, end_loc_x, end_loc_y, verts, uvs, indices);
                 }
 
                 //Always put up the left walls.
@@ -126,7 +126,7 @@ export class MazeMeshBuilder {
                         end_loc_y += halfWallThickness;
                     }
 
-				    this.generateLeftWallSubMesh(start_loc_x, start_loc_y, end_loc_x, end_loc_y, verts, indices);
+				    this.generateLeftWallSubMesh(start_loc_x, start_loc_y, end_loc_x, end_loc_y, verts, uvs, indices);
                 }
 
                 //Put up right walls around perimeter only. Reason is that the right wall will be in the exact same place as the left otherwise.
@@ -144,7 +144,7 @@ export class MazeMeshBuilder {
                         start_loc_y -= halfWallThickness;
                     }
 
-                    this.generateLeftWallSubMesh(start_loc_x, start_loc_y, end_loc_x, end_loc_y, verts, indices);
+                    this.generateLeftWallSubMesh(start_loc_x, start_loc_y, end_loc_x, end_loc_y, verts, uvs, indices);
                 }
             }
 		}
@@ -154,13 +154,14 @@ export class MazeMeshBuilder {
         var vertexData = new BABYLON.VertexData();
         vertexData.positions = verts;
         vertexData.indices = indices;
-        vertexData.normals = normals;    
+        vertexData.normals = normals;
+        vertexData.uvs = uvs;    
 
         var top_walls_mesh = new BABYLON.Mesh("maze_walls", scene);
         vertexData.applyToMesh(top_walls_mesh);
 
-        var mat = new BABYLON.StandardMaterial("maze_walls_mat", scene);
-        mat.diffuseColor = new BABYLON.Color3(1, 0, 0);
+        var mat = new BABYLON.StandardMaterial("maze_walls_material", scene);
+        mat.diffuseTexture = new BABYLON.Texture("./assets/texture/Wall1.bmp", scene);
         top_walls_mesh.material = mat;
 
         return top_walls_mesh;
@@ -206,9 +207,13 @@ export class MazeMeshBuilder {
         }
     }
 
-    private generateTopWallTriSubMesh(start_loc_x : number, start_loc_y : number, 
-                                      end_loc_x : number, end_loc_y : number,
-                                      verts : Array<Number>, indicies : Array<Number>) : void
+    private generateTopWallTriSubMesh(start_loc_x : number, 
+                                      start_loc_y : number, 
+                                      end_loc_x : number, 
+                                      end_loc_y : number,
+                                      verts : Array<Number>,
+                                      uvs: Array<Number>, 
+                                      indicies : Array<Number>) : void
     {
         let startToEndLength = (end_loc_x - start_loc_x);
         let lengthPerQuadInCell = startToEndLength / this.num_of_wall_quads_along_length;
@@ -234,6 +239,9 @@ export class MazeMeshBuilder {
                     }
 
                     verts.push(z * heightPerQuadInCell);
+
+                    uvs.push(x * reciprocalLengthPerQuadInCell);
+                    uvs.push(1 - (z * reciprocalLengthPerQuadInCell));
                 }
             }
         }
@@ -245,12 +253,15 @@ export class MazeMeshBuilder {
 
             for(let side = 0; side < 2; side++) {
                 verts.push(start_loc_x + (x * lengthPerQuadInCell));
+                uvs.push(x * reciprocalLengthPerQuadInCell);
 
                 if(side % 2 == 0) {
                     verts.push(start_loc_y - halfWallThickness);
+                    uvs.push(0.25);
                 }
                 else {
                     verts.push(start_loc_y + halfWallThickness);
+                    uvs.push(0.0);
                 }
                 
                 verts.push(this.maze_wall_height);
@@ -269,12 +280,15 @@ export class MazeMeshBuilder {
                 }
                 if(side === 0 || side === 2) {
                     verts.push(start_loc_y - halfWallThickness);
+                    uvs.push(0.25);
                 }
                 else {
                     verts.push(start_loc_y + halfWallThickness);
+                    uvs.push(0.0);
                 }
 
                 verts.push(z * heightPerQuadInCell);
+                uvs.push(1 - (z * reciprocalLengthPerQuadInCell));
             }
         }
     
@@ -334,9 +348,13 @@ export class MazeMeshBuilder {
         }
     }
 
-    private generateLeftWallSubMesh(start_loc_x : number, start_loc_y : number, 
-                                    end_loc_x : number, end_loc_y : number,
-                                    verts : Array<Number>, indicies : Array<Number>) : void {
+    private generateLeftWallSubMesh(start_loc_x : number, 
+                                    start_loc_y : number, 
+                                    end_loc_x : number, 
+                                    end_loc_y : number,
+                                    verts : Array<Number>, 
+                                    uvs: Array<Number>,
+                                    indicies : Array<Number>) : void {
         let startToEndLength = (end_loc_y - start_loc_y);
         let lengthPerQuadInCell = startToEndLength / this.num_of_wall_quads_along_length;
         let heightPerQuadInCell = this.maze_wall_height / this.num_of_wall_quads_along_length;
@@ -360,6 +378,9 @@ export class MazeMeshBuilder {
 
                     verts.push(start_loc_y + (y * lengthPerQuadInCell));
                     verts.push(z * heightPerQuadInCell);
+
+                    uvs.push(y * reciprocalLengthPerQuadInCell);
+                    uvs.push(1 - (z * reciprocalLengthPerQuadInCell));
                 }
             }
         }
@@ -368,11 +389,15 @@ export class MazeMeshBuilder {
         let indexOfShorterHorizSides = verts.length / 3;
         for (let  y = 0; y <= this.num_of_wall_quads_along_length; y++) {
             for(let side = 0; side < 2; side++) {
+                uvs.push(y * reciprocalLengthPerQuadInCell);
+                
                 if(side % 2 == 0) {
                     verts.push(start_loc_x - halfWallThickness);
+                    uvs.push(0.25);
                 }
                 else {
                     verts.push(start_loc_x + halfWallThickness);
+                    uvs.push(0.0);
                 }
 
                 verts.push(start_loc_y + (y * lengthPerQuadInCell));
@@ -385,9 +410,11 @@ export class MazeMeshBuilder {
             for(let side = 0; side < 4; side++) {
                 if(side === 0 || side === 2) {
                     verts.push(start_loc_x - halfWallThickness);
+                    uvs.push(0.25);
                 }
                 else {
                     verts.push(start_loc_x + halfWallThickness);
+                    uvs.push(0.0);
                 }
                 if(side === 0 || side === 1) {
                     verts.push(start_loc_y);
@@ -397,6 +424,7 @@ export class MazeMeshBuilder {
                 }
 
                 verts.push(z * heightPerQuadInCell);
+                uvs.push(1 - (z * reciprocalLengthPerQuadInCell));
             }
         }
 
