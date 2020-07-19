@@ -18,7 +18,8 @@ export class MazeMeshBuilder {
     }
 
     generateFloor(maze : Maze, scene: BABYLON.Scene) : BABYLON.Mesh {
-	    let verts = [];
+        let verts = [];
+        let uvs = [];
         let indices = [];
         var normals = [];
 
@@ -27,7 +28,7 @@ export class MazeMeshBuilder {
             for (let row = 0; row < maze.getNumOfRows(); row++) {
                 let top_left_x = col * total_length;
                 let top_left_y = row * total_length;
-                this.generateFloorTriSubMesh(top_left_x, top_left_y, verts, indices);
+                this.generateFloorTriSubMesh(top_left_x, top_left_y, verts, uvs, indices);
             }
         }
 
@@ -37,9 +38,14 @@ export class MazeMeshBuilder {
         vertexData.positions = verts;
         vertexData.indices = indices;
         vertexData.normals = normals;
+        vertexData.uvs = uvs;
 
         var floor_mesh = new BABYLON.Mesh("maze_floor", scene);
         vertexData.applyToMesh(floor_mesh);
+        
+        var floor_material = new BABYLON.StandardMaterial("maze_floor_material", scene);
+        floor_material.diffuseTexture = new BABYLON.Texture("./assets/texture/ground.bmp", scene);
+        floor_mesh.material = floor_material;
 
         return floor_mesh;
     }
@@ -163,19 +169,25 @@ export class MazeMeshBuilder {
         return this.maze_cell_length + this.maze_wall_thickness;
     }
 
-    private generateFloorTriSubMesh(top_left_x : number, top_left_y : number, verts : Array<Number>, indicies : Array<Number>) : void {
+    private generateFloorTriSubMesh(top_left_x : number, 
+                                    top_left_y : number, 
+                                    verts : Array<Number>,
+                                    uvs : Array<Number>, 
+                                    indicies : Array<Number>) : void {
         let lengthPerQuadInCell = this.getTotalWallAndCellLength() / this.num_of_floor_quads_along_length;
         let reciprocalLengthPerQuadInCell = 1.0 / this.num_of_floor_quads_along_length;
 
         //Get what number the verts we are about to add will be in the verts array.
         let startVertIndex = verts.length / 3;
 
-        //Generate verts for this cell's floor at the given resolution.
+        //Generate verts and uvs for this cell's floor at the given resolution.
         for (let x = 0; x <= this.num_of_floor_quads_along_length; x++) {
             for (let y = 0; y <= this.num_of_floor_quads_along_length; y++) {
                 verts.push(top_left_x + (x * lengthPerQuadInCell));
                 verts.push(top_left_y + (y * lengthPerQuadInCell));
                 verts.push(0.0);
+                uvs.push(x * reciprocalLengthPerQuadInCell);
+                uvs.push(1 - (y * reciprocalLengthPerQuadInCell));
             }
         }
 
