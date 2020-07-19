@@ -160,9 +160,9 @@ export class MazeMeshBuilder {
         var top_walls_mesh = new BABYLON.Mesh("maze_walls", scene);
         vertexData.applyToMesh(top_walls_mesh);
 
-        var mat = new BABYLON.StandardMaterial("maze_walls_material", scene);
-        mat.diffuseTexture = new BABYLON.Texture("./assets/texture/Wall1.bmp", scene);
-        top_walls_mesh.material = mat;
+        var wall_mat = new BABYLON.StandardMaterial("maze_walls_material", scene);
+        wall_mat.diffuseTexture = new BABYLON.Texture("./assets/texture/Wall1.bmp", scene);
+        top_walls_mesh.material = wall_mat;
 
         return top_walls_mesh;
     }
