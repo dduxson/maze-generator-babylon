@@ -44,7 +44,7 @@ export class MazeMeshBuilder {
         vertexData.applyToMesh(floor_mesh);
         
         var floor_material = new BABYLON.StandardMaterial("maze_floor_material", scene);
-        floor_material.diffuseTexture = new BABYLON.Texture("./assets/texture/ground.bmp", scene);
+        floor_material.diffuseTexture = new BABYLON.Texture("./assets/texture/Ground.bmp", scene);
         floor_mesh.material = floor_material;
 
         return floor_mesh;
